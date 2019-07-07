@@ -1,0 +1,202 @@
+% the main body contain two different ode functions 
+
+%%
+
+clear 
+clc 
+
+%% Parameters 
+
+beta1 = 2e-5;
+beta2 = beta1;
+phi = 0.14;
+rho = 0.05;
+xi = 0.1;
+delta1 = 3;
+kappa1 = 3.2e-3;
+p1 = 0.35;
+c1 = 20;
+beta_prime1 = 5e-7;
+gamma_prime1 = 5e-10;
+delta2 = delta1;
+kappa2 = kappa1;
+p2 = p1;
+c2 = c1;
+beta_prime2 = beta_prime1;
+gamma_prime2 = gamma_prime1;
+q1 = 5e-6;
+q2 = 1e-4;
+d = 2;
+s = 0.38;
+k = 5;
+sai1 = 5e-9;
+sai2 = 5e-8;
+delta_M = 24e-4;
+delta_MA = 12e-3;
+
+
+%% Time 
+
+start_time = 0;
+end_time = 1;   % varied 
+number_report_time_point = (end_time - start_time) * 24 + 1;
+report_time_point = linspace(start_time,end_time,number_report_time_point);
+len = length(report_time_point);
+
+%% variables 
+
+T = zeros(1,len);
+I1 = zeros(1,len);
+V1 = zeros(1,len);
+R = zeros(1,len);
+F = zeros(1,len);
+M = zeros(1,len);
+MA = zeros(1,len);
+
+T0 = 1e+7;
+I10 = 0;
+V10 = 1e+2;
+R0 = 0;
+F0 = 0;
+M0 = 1e+5;
+MA0 = 0;
+
+T(1) = T0;
+V1(1) = V10;
+M(1) = M0;
+
+init1 = [T0,I10,V10,R0,F0,M0,MA0]';
+
+%% 
+options = setode('RelTol',1e-3, 'AbsTol',1e-6);
+
+%% odes solver (early)
+
+[t,y1] = ode15s(@fn1,report_time_point, init1, options, ...
+                 beta1, phi,rho,xi,delta1,kappa1,p1,c1,beta_prime1,...
+                 gamma_prime1,q1,q2,d,s,k,sai1,sai2,delta_M,delta_MA);
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%% Time2 
+
+start_time2 = end_time;
+end_time2 = 7;   % varied 
+number_report_time_point2 = (end_time2 - start_time2) * 24 + 1;
+report_time_point2 = linspace(start_time2,end_time2,number_report_time_point2);
+len2 = length(report_time_point2);
+
+%% variables2
+
+T = zeros(1,len2);
+I1 = zeros(1,len2);
+V1 = zeros(1,len2);
+I2 = zeros(1,len2);
+V2 = zeros(1,len2);
+R = zeros(1,len2);
+F = zeros(1,len2);
+M = zeros(1,len2);
+MA = zeros(1,len2);
+
+
+%% update initial condition 
+
+
+T_end = y1(end,1);
+I1_end = y1(end,2);
+V1_end = y1(end,3);
+I20 = 0;
+V20 = 1e+2;
+R_end = y1(end,4);
+F_end = y1(end,5);
+M_end = y1(end,6);
+MA_end = y1(end,7);
+
+T(1) = T_end;
+I1(1) = I1_end;
+V1(1) = V1_end;
+I2(1) = I20;
+V2(1) = V20;
+R(1) = R_end;
+F(1) = F_end;
+M(1) = M_end;
+MA(1) = MA_end;
+
+
+init2 = [T_end,I1_end,V1_end,I20,V20,R_end,F_end,M_end,MA_end]';
+
+
+%% odes solver (Later)
+
+[t,y2] = ode15s(@fn2,report_time_point2, init2, options, ...
+                 beta1, phi,rho,xi,delta1,kappa1,p1,c1,beta_prime1,...
+                 gamma_prime1,q1,q2,d,s,k,sai1,sai2,delta_M,delta_MA,...
+                 beta2, delta2, kappa2, p2,c2,beta_prime2,gamma_prime2);
+  
+ 
+ %% plots
+ 
+ figure(1) % viral load 
+ semilogy(report_time_point,y1(:,3))
+ hold on 
+ semilogy(report_time_point2, y2(:,3))
+ semilogy(report_time_point2, y2(:,5))
+ 
+ 
+ 
+ %%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+
+
+function yn = fn1(~,y,beta1, phi,rho,xi,delta1,kappa1,p1,c1,beta_prime1,...
+                 gamma_prime1,q1,q2,d,s,k,sai1,sai2,delta_M,delta_MA)
+            
+            yn = zeros(7,1);
+            yn(1) = -beta1 * y(1) * y(3) - phi * y(1) * y(5) + rho * y(4);
+            yn(2) = beta1 * y(1) * y(3) - delta1 * y(2) - kappa1 * y(7) * y(2);
+            yn(3) = p1 * y(2) - c1 * y(3) - beta_prime1 * y(1) * y(3) * gamma_prime1 * y(6) * y(3);
+            yn(4) = phi * y(1) * y(5) - rho * y(4) - xi * y(4);
+            yn(5) = q1 * y(2) + q2 * y(7) - d * y(5);
+            yn(6) = s * y(5)^2 / (y(5)^2 + k^2) - sai1 * y(3) * y(6) - sai2 * y(5) * y(6) - delta_M * y(6);
+            yn(7) = sai1 * y(3) * y(6) + sai2 * y(5) * y(6) - delta_MA * y(7);
+end 
+
+
+
+
+
+function yn = fn2(~,y,beta1, phi,rho,xi,delta1,kappa1,p1,c1,beta_prime1,...
+                 gamma_prime1,q1,q2,d,s,k,sai1,sai2,delta_M,delta_MA,...
+                 beta2, delta2, kappa2, p2,c2,beta_prime2,gamma_prime2)
+            
+            yn = zeros(9,1);
+            yn(1) = -beta1 * y(1) * y(3) - beta2 * y(1) * y(5) - phi * y(1) * y(7) + rho * y(6);
+            yn(2) = beta1 * y(1) * y(3) - delta1 * y(2) - kappa1 * y(9) * y(2);
+            yn(3) = p1 * y(2) - c1 * y(3) - beta_prime1 * y(1) * y(3) * gamma_prime1 * y(6) * y(3);
+            yn(4) = beta2 * y(1) * y(5) - delta2 * y(4) - kappa2 * y(9) * y(4);
+            yn(5) = p2 * y(4) - c2 * y(5) - beta_prime2 * y(1) * y(5) * gamma_prime1 * y(8) * y(5);
+            
+            yn(6) = phi * y(1) * y(7) - rho * y(6) - xi * y(6);
+            yn(7) = q1 * (y(2) + y(4)) + q2 * y(9) - d * y(7);
+            yn(8) = s * y(7)^2 / (y(7)^2 + k^2) - sai1 * (y(3) + y(5)) * y(8) - sai2 * y(7) * y(8) - delta_M * y(8);
+            yn(9) = sai1 * (y(3) + y(5)) * y(8) + sai2 * y(7) * y(8) - delta_MA * y(9);
+end 
+
+
+
+
+
+
+
+
+
+
+
+
