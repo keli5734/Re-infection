@@ -179,7 +179,7 @@ function yn = fn2(~,y,beta1, phi,rho,xi,delta1,kappa1,p1,c1,beta_prime1,...
             yn = zeros(9,1);
             yn(1) = -beta1 * y(1) * y(3) - beta2 * y(1) * y(5) - phi * y(1) * y(7) + rho * y(6);
             yn(2) = beta1 * y(1) * y(3) - delta1 * y(2) - kappa1 * y(9) * y(2);
-            yn(3) = p1 * y(2) - c1 * y(3) - beta_prime1 * y(1) * y(3) * gamma_prime1 * y(6) * y(3);
+            yn(3) = p1 * y(2) - c1 * y(3) - beta_prime1 * y(1) * y(3) * gamma_prime1 * y(8) * y(3);
             yn(4) = beta2 * y(1) * y(5) - delta2 * y(4) - kappa2 * y(9) * y(4);
             yn(5) = p2 * y(4) - c2 * y(5) - beta_prime2 * y(1) * y(5) * gamma_prime1 * y(8) * y(5);
             
