@@ -205,19 +205,24 @@ end
 
 function yn = fn2(~,y,beta1, phi,rho,xi,delta1,kappa1,p1,c1,beta_prime1,...
                  gamma_prime1,q1,q2,d,s,k,sai1,sai2,delta_M,delta_MA,...
-                 beta2, delta2, kappa2, p2,c2,beta_prime2,gamma_prime2)
+                 beta2, delta2, kappa2, p2,c2,beta_prime2,gamma_prime2,...
+                 mu1,mu2,rho2,kappa_A,delta_A)
             
-            yn = zeros(9,1);
+            yn = zeros(11,1);
             yn(1) = -beta1 * y(1) * y(3) - beta2 * y(1) * y(5) - phi * y(1) * y(7) + rho * y(6);
             yn(2) = beta1 * y(1) * y(3) - delta1 * y(2) - kappa1 * y(9) * y(2);
-            yn(3) = p1 * y(2) - c1 * y(3) - beta_prime1 * y(1) * y(3) * gamma_prime1 * y(8) * y(3);
+            yn(3) = p1 * y(2) - c1 * y(3) - beta_prime1 * y(1) * y(3) - gamma_prime1 * y(8) * y(3) - kappa_A * y(3) * y(10);
             yn(4) = beta2 * y(1) * y(5) - delta2 * y(4) - kappa2 * y(9) * y(4);
-            yn(5) = p2 * y(4) - c2 * y(5) - beta_prime2 * y(1) * y(5) * gamma_prime1 * y(8) * y(5);
-            
+            yn(5) = p2 * y(4) - c2 * y(5) - beta_prime2 * y(1) * y(5) - gamma_prime2 * y(8) * y(5) - kappa_A * y(5) * y(11);
             yn(6) = phi * y(1) * y(7) - rho * y(6) - xi * y(6);
             yn(7) = q1 * (y(2) + y(4)) + q2 * y(9) - d * y(7);
-            yn(8) = s * y(7)^2 / (y(7)^2 + k^2) - sai1 * (y(3) + y(5)) * y(8) - sai2 * y(7) * y(8) - delta_M * y(8);
-            yn(9) = sai1 * (y(3) + y(5)) * y(8) + sai2 * y(7) * y(8) - delta_MA * y(9);
+            yn(8) = s * y(7)^2 / (y(7)^2 + k^2) - sai1 * (y(3) + y(5)) * y(8) - sai2 * y(7) * y(8) - delta_M * y(8) + rho2 * y(9);
+            yn(9) = sai1 * (y(3) + y(5)) * y(8) + sai2 * y(7) * y(8) - delta_MA * y(9) - rho2 * y(9);
+            yn(10) = mu1 * y(9) + mu2 * y(10) * y(9) - delta_A * y(10);
+            yn(11) = mu1 * y(9) + mu2 * y(11) * y(9) - delta_A * y(11);
+            
+           
+            
 end 
 
 
